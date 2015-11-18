@@ -4,7 +4,7 @@ RPFeedback is an iOS framework for the [ReviewPush](https://www.reviewpush.com) 
 #### Getting Started
 RPFeedback is available on [CocoaPods](https://cocoapods.org). Add the following to your Podfile:
 
-`pod 'RPFeedback'`
+`pod "RPFeedback", :podspec => "https://raw.githubusercontent.com/mtorcutt/RPFeedback/master/RPFeedback.podspec"`
 
 #### Requirements
 
