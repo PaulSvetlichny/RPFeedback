@@ -1,9 +1,9 @@
 //
-//  ReviewPushClient.m
-//  Review Push For Business
+//  RPFeedbackClient.m
+//  AFTesting
 //
-//  Created by Michael Orcutt on 7/29/15.
-//  Copyright (c) 2015 ReviewPush. All rights reserved.
+//  Created by Plumb on 8/28/16.
+//  Copyright © 2016 docureach.rp. All rights reserved.
 //
 
 #import "RPFeedbackClient.h"
@@ -49,7 +49,7 @@ NSString * const ReviewPushLocationFormatURLString = @"locations/%@";
     return _sharedClient;
 }
 
-#pragma mark - Request Helper 
+#pragma mark - Request Helper
 
 - (NSDictionary *)authorizedParameterDictionaryWithDictionary:(NSDictionary *)dictionary {
     NSMutableDictionary *mutableDictionary = nil;
@@ -77,18 +77,20 @@ NSString * const ReviewPushLocationFormatURLString = @"locations/%@";
     
     NSDictionary *parameters = [self authorizedParameterDictionaryWithDictionary:dictionary];
     
-    [self POST:ReviewPushFeedbackURLString parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        
+    [self POST:ReviewPushFeedbackURLString
+    parameters:parameters
+      progress:nil
+       success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         if(!completionBlock) {
             return;
         }
-        
+           
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            
+
             NSError *error = nil;
-            
+
             Feedback *feedback = [[Feedback alloc] initWithDictionary:responseObject[@"data"] error:&error];
-            
+
             dispatch_async(dispatch_get_main_queue(), ^{
                 if(error) {
                     completionBlock(NO, nil, nil, nil);
@@ -96,15 +98,11 @@ NSString * const ReviewPushLocationFormatURLString = @"locations/%@";
                     completionBlock(YES, feedback, responseObject[@"review_site_links"], nil);
                 }
             });
-            
         });
-        
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         if(completionBlock) {
             completionBlock(NO, nil, nil, nil);
         }
-
     }];
 }
 
@@ -114,7 +112,7 @@ NSString * const ReviewPushLocationFormatURLString = @"locations/%@";
                       completion:(void(^)(BOOL success,
                                           NSArray *locations,
                                           NSString *errorMessage))completionBlock {
-
+    
     NSDictionary *parameters = nil;
     if(location != nil) {
         NSDictionary *dictionary = @{ @"latitude"  : @(location.coordinate.latitude),
@@ -125,45 +123,45 @@ NSString * const ReviewPushLocationFormatURLString = @"locations/%@";
         parameters = [self authorizedParameterDictionaryWithDictionary:nil];
     }
     
-    [self GET:ReviewPushLocationURLString parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [self GET:ReviewPushLocationURLString
+   parameters:parameters
+     progress:nil
+      success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+          
+          NSLog(@"responseObject %@", responseObject);
+  
+          if(!completionBlock) {
+              return;
+          }
+          
+          dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+  
+              NSMutableArray *locations = [NSMutableArray new];
+  
+              [responseObject[@"data"] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+  
+                  NSError *error = nil;
+  
+                  RPLocation *location = [[RPLocation alloc] initWithDictionary:obj error:&error];
+  
+                  [locations addObject:location];
+  
+              }];
+  
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  completionBlock(YES, locations, nil);
+              });
+              
+          });
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         
-        NSLog(@"responseObject %@", responseObject);
-        
-        if(!completionBlock) {
-            return;
-        }
-        
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            
-            NSMutableArray *locations = [NSMutableArray new];
-            
-            [responseObject[@"data"] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                
-                NSError *error = nil;
-                
-                RPLocation *location = [[RPLocation alloc] initWithDictionary:obj error:&error];
-                
-                [locations addObject:location];
-                
-            }];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completionBlock(YES, locations, nil);
-            });
-            
-        });
-     
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        
-        NSLog(@"operation.responseObject %@", operation.responseObject);
-        NSLog(@"error %@", error);
+         NSLog(@"operation.responseObject %@", task.response);
+         NSLog(@"error %@", error);
 
-        if(completionBlock) {
-            completionBlock(NO, nil, nil);
-        }
-        
+         if(completionBlock) {
+             completionBlock(NO, nil, nil);
+         }
     }];
-
 }
 
 - (void)GETLocation:(RPLocation *)location
@@ -175,36 +173,34 @@ NSString * const ReviewPushLocationFormatURLString = @"locations/%@";
     
     NSString *urlString = [NSString stringWithFormat:ReviewPushLocationFormatURLString, location.identifier];
     
-    [self GET:urlString parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        
-        if(!completionBlock) {
-            return;
-        }
-        
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            
-            NSError *error = nil;
-                
-            RPLocation *location = [[RPLocation alloc] initWithDictionary:responseObject[@"data"] error:&error];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if(error) {
-                    completionBlock(NO, nil, nil);
-                } else {
-                    completionBlock(YES, location, nil);
-                }
-            });
-            
-        });
-        
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        
-        if(completionBlock) {
-            completionBlock(NO, nil, nil);
-        }
-        
+    [self GET:urlString
+   parameters:parameters
+     progress:nil
+      success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+          if(!completionBlock) {
+              return;
+          }
+  
+          dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+  
+              NSError *error = nil;
+  
+              RPLocation *location = [[RPLocation alloc] initWithDictionary:responseObject[@"data"] error:&error];
+  
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  if(error) {
+                      completionBlock(NO, nil, nil);
+                  } else {
+                      completionBlock(YES, location, nil);
+                  }
+              });
+              
+          });
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            if(completionBlock) {
+                completionBlock(NO, nil, nil);
+            }
     }];
-    
 }
 
 @end

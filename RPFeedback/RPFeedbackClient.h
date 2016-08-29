@@ -1,19 +1,17 @@
 //
-//  ReviewPushClient.h
-//  Review Push For Business
+//  RPFeedbackClient.h
+//  AFTesting
 //
-//  Created by Michael Orcutt on 7/29/15.
-//  Copyright (c) 2015 ReviewPush. All rights reserved.
+//  Created by Plumb on 8/28/16.
+//  Copyright © 2016 docureach.rp. All rights reserved.
 //
 
-#import "AFHTTPRequestOperationManager.h"
-
+#import <AFNetworking/AFNetworking.h>
 #import <CoreLocation/CoreLocation.h>
-
 #import "Feedback.h"
 #import "RPLocation.h"
 
-@interface RPFeedbackClient : AFHTTPRequestOperationManager
+@interface RPFeedbackClient : AFHTTPSessionManager
 
 ///------------------------------------------------
 /// @name Initialization
@@ -31,7 +29,7 @@
 ///------------------------------------------------
 
 /**
- * -POSTFeedback:completion: posts 
+ * -POSTFeedback:completion: posts
  * the user review to ReviewPush servers.
  *
  * @required params: see docs
@@ -51,8 +49,8 @@
                                           NSArray *locations,
                                           NSString *errorMessage))completionBlock;
 
-/** 
- * -GETLocation:Completion: gets the 
+/**
+ * -GETLocation:Completion: gets the
  * supplied location. The only
  * required property on location
  * is identifier.
@@ -61,5 +59,7 @@
          completion:(void(^)(BOOL success,
                              RPLocation *location,
                              NSString *errorMessage))completionBlock;
+
+
 
 @end
