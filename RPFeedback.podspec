@@ -6,7 +6,7 @@ s.name = "RPFeedback"
 s.summary = "RPFeedback lets ReviewPush companies submit feedback at a company level."
 s.requires_arc = true
 
-s.version = "0.1.013"
+s.version = "0.1.014"
 
 s.license = "MIT"
 
@@ -14,7 +14,7 @@ s.author = { "Michael Orcutt" => "michaeltorcutt@gmail.com" }
 
 s.homepage = "http://reviewpush.com"
 
-s.source = { :git => "https://github.com/mtorcutt/RPFeedback.git", :tag => s.version.to_s }
+s.source = { :git => "https://github.com/PaulSvetlichny/RPFeedback.git", :tag => s.version.to_s }
 
 s.framework = "UIKit"
 s.dependency 'AFNetworking'
